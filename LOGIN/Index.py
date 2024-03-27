@@ -47,8 +47,24 @@ PassLabel.place(x=5, y= 135)
 PassEntry = ttk.Entry(RightFrame, width=37, show="•")
 PassEntry.place (x=109, y=146)
 
+def Login():
+    User = UserEntry.get()
+    Pass = PassEntry.get()
+    
+    DataBaser.cursor.execute("""
+    SELECT * FROM Users
+    WHERE (User = ? and Password = ?)
+    """, (User, Pass))
+    print("Selecionou")
+    VerifyLogin = DataBaser.cursor.fetchone()
+    try:
+        if (User in VerifyLogin and Pass in VerifyLogin):
+            messagebox.showinfo(title="Login Info", message="Acesso confirmado, bem vindo!")
+    except:
+        messagebox.showerror(title="Login Info", message="Acesso negado. Login ou senha incorretos")
+    
 #Botões
-LoginButton = ttk.Button(RightFrame, text="Entrar", width=20)
+LoginButton = ttk.Button(RightFrame, text="Entrar", width=20, command=Login)
 LoginButton.place(x=125, y=200)
 
 def Register():
@@ -80,11 +96,15 @@ def Register():
         Email = EmailEntry.get()
         User = UserEntry.get()
         Pass = PassEntry.get()
-        DataBaser.cursor.execute('''
-        INSERT INTO Users(Name, Email, User, Password) VALUES(?, ?, ?, ?)
-        ''', (Name, Email, User, Pass))
-        DataBaser.conn.commit()
-        messagebox.showinfo(title='Register Info', message='Account created successfully')
+
+        if (Name == "" or Email == "" or User == "" or Pass == ""):
+            messagebox.showerror(title="Erro no registro", message="Todos os campos devem ser preenchidos")
+        else:
+            DataBaser.cursor.execute('''
+            INSERT INTO Users(Name, Email, User, Password) VALUES(?, ?, ?, ?)
+            ''', (Name, Email, User, Pass))
+            DataBaser.conn.commit()
+            messagebox.showinfo(title='Register Info', message='Account created successfully')
 
     Register = ttk.Button(RightFrame, text="Registrar", width=30, command=RegisterToDataBase)
     Register.place(x=125, y=225)
